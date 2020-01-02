@@ -1,0 +1,8 @@
+Tốc độ:
+Thời gian xử lý để nhận diện:
+Biển báo nguy hiểm: 0.340s
+Biển báo cấm: 0.498s
+Biển chỉ dẫn: 0.386s
+Biển hiệu lệnh: 0.394s
+
+Độ chính xác: sau khi sử dụng 12 biển báo và kiểm tra 100 lần thì nhận thấy rằng tỉ lệ phát hiện và nhận diện biển báo khá cao có thể lên đến 99%. 
