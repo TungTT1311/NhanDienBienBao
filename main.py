@@ -8,8 +8,8 @@ import time
 from matplotlib import pyplot as plt
 import math
 
-MIN_MATCH_COUNT = 9
-TiLeChon = 20
+MIN_MATCH_COUNT = 5
+TiLeChon = 10
 # Lay BIEN CAM
 mypath = 'C:\\Users\\TungTT\\PycharmProjects\\untitled1\\CacLoaiBien\\BienCam'
 onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
@@ -38,7 +38,7 @@ for n in range(0, len(onlyfiles)):
 Ten_Bien_Cam = ["Cam nguoi di bo", "Cam oto", "Toc do toi da 40"]
 Ten_Bien_ChiDan = ["Chi dan: Cho quay dau", "Chi dan: Uu tien qua duong hep", "Chi dan: Duong danh chi oto"]
 Ten_Bien_NguyHiem = ["Duong bi hep 2 ben", "Giao nhau voi duong khong uu tien", "Vach nui nguy hiem"]
-Ten_Bien_HieuLenh = ["Chi duoc di thang", "Duong danh cho nguoi di bo", "Duong danh cho xe tho so"]
+Ten_Bien_HieuLenh = ["Chi duoc di thang", "Duong danh cho nguoi di bo", "Noi giao nhau theo vong xuyen"]
 font = cv2.FONT_HERSHEY_SIMPLEX
 
 def find_biggest_contour(image,red):
@@ -113,7 +113,6 @@ def SIFT_Dectect(img1, img2):
         dst_pts = np.float32([kp2[m.trainIdx].pt for m in good]).reshape(-1, 1, 2)
         M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
         pts1 = src_pts[mask == 1]
-
         percentage_similarity = len(pts1) / len(kp1) * 100
         # print(percentage_similarity)
         return percentage_similarity
@@ -129,6 +128,7 @@ def SIFT_Dectect(img1, img2):
 
 # bo frame vao cho image
 def DetectAndRecognize(imgFrame,red):
+    max = 0
     Bdot = 3
     imgBlur = cv2.GaussianBlur(imgFrame, (Bdot, Bdot), 0)
     imgBlurRGB = cv2.cvtColor(imgBlur, cv2.COLOR_BGR2RGB)
@@ -194,12 +194,14 @@ def DetectAndRecognize(imgFrame,red):
     try:
         for i in range(len_images):
             res = SIFT_Dectect(cropped, images[i])
-            if res > TiLeChon:
-                index = i
+            if i == len_images:
                 break
+            if res > max:
+                max = res
+                index = i
     except Exception as e:
         pass
-    return TenBien,res, index, x, y, w, h
+    return TenBien,max, index, x, y, w, h
 
 
 if __name__ == '__main__':
@@ -218,7 +220,7 @@ if __name__ == '__main__':
     # init
     index = x = y = w = h = 0
     Ti_le = 0.001
-
+    time_everage = 0
     while True:
         pre_time = time.time()
         _, image = cap.read()
@@ -256,8 +258,10 @@ if __name__ == '__main__':
                 TenBien, Ti_le, index, x, y, w, h = DetectAndRecognize(image,red)
                 red = not red
                 if (Ti_le > TiLeChon):
+                    end_time = time.time()
+                    print(end_time - pre_time)
                     cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 3)
-                    print(TenBien[index])
+                    # print(TenBien[index])
                     cv2.putText(image, TenBien[index], (x , y), font, 0.8, (255, 255, 255), 2,
                                 cv2.LINE_AA)
                 # end of detect
